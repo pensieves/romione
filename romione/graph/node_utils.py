@@ -1,15 +1,22 @@
 import yaml
 import sympy as sp
 
+from romione.graph.compute_utils import parse_vector
 from romione.graph.Node import Node
 
 
-def get_node_values(graph):
+def get_node_values(graph, nodes=[]):
     node_values = []
-    for n in graph.nodes:
+    if not nodes:
+        nodes = graph.nodes
+    elif isinstance(nodes, str):
+        nodes = [nodes]
+
+    for n in nodes:
         node = graph.nodes[n]["node"]
         if isinstance(node.name, sp.Symbol):
             node_values.append((node.name.name, node.value))
+    
     return node_values
 
 def set_node_values(graph, values=sp.Float(0)):
@@ -19,10 +26,10 @@ def set_node_values(graph, values=sp.Float(0)):
         if isinstance(values, dict):
             if isinstance(node.name, sp.Symbol):
                 if node.name.name in values:
-                    node.value = values[node.name.name]
+                    node.value = parse_vector(values[node.name.name])
 
         else:
-            node.value = values
+            node.value = parse_vector(values)
     
     return graph
 
