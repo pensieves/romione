@@ -33,15 +33,18 @@ class Node(object):
             for s in set.union(self.lhs.free_symbols, self.rhs.free_symbols):
                 self.graph.add_edge(s.name, self.name)
 
-
     def get_complexity(self):
-        r"""Heuristics based complexity estimation to prioritize equations for 
+        r"""Heuristics based complexity estimation to prioritize equations for
         solving in terms of target symbols."""
 
         complexity_value = 0
         if self.eqn is not None:
             expr = self.lhs - self.rhs
-            tgt_symbols = [s for s in expr.free_symbols if self.graph.nodes[s.name]["node"].value is None]
+            tgt_symbols = [
+                s
+                for s in expr.free_symbols
+                if self.graph.nodes[s.name]["node"].value is None
+            ]
             complexity_value += complexity(expr, tgt_symbols)
 
         return complexity_value
