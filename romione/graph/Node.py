@@ -1,95 +1,67 @@
+import sympy as sp
 from sympy import Symbol
 from sympy.solvers import solve
 from sympy.parsing.sympy_parser import parse_expr
 
 from romione.graph.compute_utils import parse_vector
+from romione.graph.heuristics import complexity
+
 
 class Node(object):
+    def __init__(
+        self,
+        name="s",
+        value=0,
+        eqn=None,
+        graph=None,
+    ):
 
-	def __init__(
-		self, 
-		name="s",
-		value=0,
-		eqn=None,
-		graph=None,
-	):
+        self.name = name if eqn else Symbol(name)
+        self.value = parse_vector(value)
+        self.graph = graph
+        self.eqn = eqn
 
-		self.name = name if eqn else Symbol(name)
-		self.value = parse_vector(value)
-		self.graph = graph
-		self.eqn = eqn
-		
-		if eqn is not None:
-			eqn = [i.strip() for i in eqn.split("=")]
-			self.lhs = parse_expr(eqn[0])
-			self.rhs = parse_expr(eqn[1])
+        if eqn is not None:
+            eqn = [i.strip() for i in eqn.split("=")]
+            self.lhs = parse_expr(eqn[0])
+            self.rhs = parse_expr(eqn[1])
 
-		self.add_edges()
+        self.add_edges()
 
-	def add_edges(self):
-		if self.graph is not None:
-			symbols = self.get_symbols()
-			for s in symbols:
-				self.graph.add_edge(s.name, self.name)
+    def add_edges(self):
+        if self.graph is not None:
+            for s in set.union(self.lhs.free_symbols, self.rhs.free_symbols):
+                self.graph.add_edge(s.name, self.name)
 
 
-	def get_symbols(self):
-		symbols = set()
-		if self.eqn is not None:
-			stack = [self.lhs, self.rhs]
-			while stack:
-				op = stack.pop()
+    def get_complexity(self):
+        r"""Heuristics based complexity estimation to prioritize equations for 
+        solving in terms of target symbols."""
 
-				# operator is a symbol e.g. lhs in v = u + a * t
-				if isinstance(op, Symbol) and op not in symbols:
-					symbols.add(op)
+        complexity_value = 0
+        if self.eqn is not None:
+            expr = self.lhs - self.rhs
+            tgt_symbols = [s for s in expr.free_symbols if self.graph.nodes[s.name]["node"].value is None]
+            complexity_value += complexity(expr, tgt_symbols)
 
-				else:
-					for args in op.args:					
-						if isinstance(args, Symbol) and args not in symbols:
-							symbols.add(args)
-						else:
-							stack.append(args)
-		
-		return symbols
+        return complexity_value
 
-	def get_complexity(self):
-		complexity = 0
-		if self.eqn is not None:
-			stack = [self.lhs, self.rhs]
-			while stack:
-				op = stack.pop()
-				sub_complexity = 0
+    def solve(self):
+        if self.eqn is not None:
+            solve_for = []
+            eqn = self.lhs - self.rhs
 
-				# operator is a symbol e.g. lhs in v = u + a * t
-				if isinstance(op, Symbol) and self.graph.nodes[op.name]["node"].value is None:
-					sub_complexity = 1
+            for i in self.graph.pred[self.name]:
+                node = self.graph.nodes[i]["node"]
+                if isinstance(node.name, Symbol):
+                    if node.value is None:
+                        solve_for.append(node.name)
+                    else:
+                        eqn = eqn.subs(node.name, node.value)
 
-				else:
-					for args in op.args:
-						pass
+            res = solve(eqn, *solve_for)
 
-				complexity += sub_complexity
+            return res
 
-
-		return complexity
-
-	def solve(self):
-		if self.eqn is not None:
-			solve_for = []
-			eqn = self.lhs - self.rhs
-
-			for i in self.graph.pred[self.name]:
-				node = self.graph.nodes[i]["node"]
-				if isinstance(node.name, Symbol):
-					if node.value is None:
-						solve_for.append(node.name)
-					else:
-						eqn = eqn.subs(node.name, node.value)
-			
-			res = solve(eqn, *solve_for)
-
-			return res
-
-	def propagate(self):
-		raise NotImplementedError
+    def propagate(self):
+        raise NotImplementedError
