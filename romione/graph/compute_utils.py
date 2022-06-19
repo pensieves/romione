@@ -13,10 +13,10 @@ def parse_vector(value, coord_sys=CoordSys3D("N")):
         }
 
         components = sp.collect(value, vec_map.keys(), evaluate=False)
-        
+
         if set.intersection(set(vec_map.keys()), set(components.keys())):
-            value = 0*coord_sys._base_vectors[0]
-            for k,v in components.items():
-                value += v*vec_map.get(k, k)
+            value = 0 * coord_sys._base_vectors[0]
+            for k, v in components.items():
+                value += v * vec_map.get(k, k)
 
     return value
