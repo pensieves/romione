@@ -8,4 +8,8 @@ Named after the duo companion of Harry Potter i.e. Ron and Hermione who were the
 
 #### Installation:
 
-Install the latest version using `pip install romione`.
+Install the latest version using:
+
+```
+pip install romione
+```
