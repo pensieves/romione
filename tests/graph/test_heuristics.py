@@ -7,7 +7,7 @@ def test_complexity():
         ("a**2+a", "t", 0),
         ("a*t+1", "t", 1),
         ("a*t**3/2*(t**2+1)", "t", 3),
-        ("sin(t)", "t", 1), 
+        ("sin(t)", "t", 1),
         ("sin(t)+cos(t)", "t", 1),
         ("sin(t)*cos(t)", "t", 2),
         ("a*t+sin(t)*cos(t)", "t", 3),

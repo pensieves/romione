@@ -32,7 +32,8 @@ def test_expr_allowed():
             assert expr_values == [parse_expr(i) for i in test["expr_res"]]
 
             test_conditions = (
-                test["maxima_conditions"] if fn == maximize 
+                test["maxima_conditions"]
+                if fn == maximize
                 else test["minima_conditions"]
             )
             assert conditions == [parse_expr(i) for i in test_conditions]
@@ -69,7 +70,8 @@ def test_expr_disallowed():
             assert expr_values == [parse_expr(i) for i in test["expr_res"]]
 
             test_conditions = (
-                test["maxima_conditions"] if fn == maximize 
+                test["maxima_conditions"]
+                if fn == maximize
                 else test["minima_conditions"]
             )
 
@@ -100,11 +102,13 @@ def test_symbol_infer():
         for fn in (maximize, minimize):
             for allow_expr_return in (True, False):
                 symbol, points, expr_values, conditions = fn(
-                    test["expr"], test["symbol"], allow_expr_return=allow_expr_return,
+                    test["expr"],
+                    test["symbol"],
+                    allow_expr_return=allow_expr_return,
                 )
 
                 assert symbol == next(iter(parse_expr(test["expr"]).free_symbols))
-                
+
                 if fn == maximize:
                     assert points == [parse_expr(i) for i in test["symbol_res"]]
                     assert expr_values == [parse_expr(i) for i in test["expr_res"]]
