@@ -1,7 +1,7 @@
 import yaml
 import sympy as sp
 
-from romione.graph.compute_utils import parse_vector
+from romione.graph.parse_utils import parse_vector
 from romione.graph.Node import Node
 
 

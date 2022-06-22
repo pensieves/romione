@@ -3,7 +3,7 @@ from sympy import Symbol
 from sympy.solvers import solve
 from sympy.parsing.sympy_parser import parse_expr
 
-from romione.graph.compute_utils import parse_vector
+from romione.graph.parse_utils import parse_vector
 from romione.graph.heuristics import complexity
 
 
