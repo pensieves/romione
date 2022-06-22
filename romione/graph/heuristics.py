@@ -1,5 +1,7 @@
 import sympy as sp
 
+from romione.graph.parse_utils import fn_repl
+
 
 def complexity(expr, tgt_symbols):
     r"""Heuristics based complexity estimation to prioritize equations for
@@ -24,11 +26,7 @@ def complexity(expr, tgt_symbols):
             if x_ in expr.free_symbols:
                 # replace any function with an identity function
                 # (Probably not a great heauristic for now)
-                expr = expr.replace(
-                    lambda expr: expr.is_Function,
-                    lambda expr: expr.args[0],  # just take the argument and return it
-                )
-
+                expr = fn_repl(expr, repl_map=None)
                 value += complexity(expr, (x_,))
 
         if poly_terms:
